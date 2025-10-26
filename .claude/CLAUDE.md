@@ -103,7 +103,47 @@ ALWAYS catch `ApiException` in components for structured error display.
 `App.svelte`: Root component
 - Use `onMount` for API calls on load
 - Use `{#if}` blocks for conditional rendering
-- Keep styles scoped in `<style>` block
+
+## UI 
+
+### Implementation Guidelines
+PREFER Tailwind utility classes for styling
+
+ALWAYS use CSS variables for colors - NEVER hardcode color values
+ALWAYS review components for **WCAG AA/AAA contrast compliance** between text and 
+ALWAYS use the WCAG contrast formula (luminance ratio) to ensure **at least 4.5:1** for normal text and **3:1** for large text.background colors.
+ALWAYS colors MUST come from predefined CSS variables
+ALWAYS Define color palettes in CSS custom properties (`:root` or component-level)
+ALWAYS use consistent spacing scales, typography scales and color scales
+ALWAYS design reusable components with single responsibility
+
+
+### Design Principles
+PREFER clarity over decoration
+PREFER invisible UI - don't add chrome unless absolutely needed
+PREFER Minimalistic UI
+PREFER subtle gradients over solid backgrounds
+
+ALWAYS Allow dark and light mode
+ALWAYS use semantic HTML
+ALWAYS provide visible focus states for keyboard navigation
+ALWAYS use ARIA attributes where semantic HTML isn't sufficient
+
+NEVER use `<div>` for interactive elements
+
+#### Map Layout Patterns
+ALWAYS display map full width and full height of the viewing port. For example: `w-screen h-screen` or `w-full h-full`. Edit any parent container to allow this.
+ALWAYS let UI elements overlay the map and be liquid glass
+NEVER use side-by-side or split-screen layouts with the map
+
+#### Liquid Glass (Glassmorphism)
+- Frosted glass effect with backdrop blur
+- Semi-transparent backgrounds with subtle opacity
+- Layered depth with soft shadows
+- Light borders for definition
+- Smooth transitions and animations
+- Apply glassmorphism: `backdrop-blur-md bg-[var(--glass-bg)] border border-[var(--glass-border)]`
+
 
 ## Configuration
 
