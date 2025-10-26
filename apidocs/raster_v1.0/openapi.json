@@ -1,0 +1,373 @@
+{
+  "x-generator": "NSwag v14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))",
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Skogsstyrelsens Raster API v1.0",
+    "description": "## Schema\r\nAlla anrop måste ske över HTTPS. All data till och från Skogsstyrelsen API är JSON.  \r\nAlla datum i Skogsstyrelsen API anges på formatet ISO 8601.  \r\n`YYYY-MM-DDTHH:MM:SS`\r\n\r\n## HTTP-verb\r\nSkogsstyrelsen API använder standard HTTP-verb för alla anrop.\r\n\r\n| Verb | Beskrivning |\r\n| ----------- | ----------- |\r\n| GET | Används för att hämta data. |\r\n| POST | Används för att hämta data med geometrier (WKT) som parameter |\r\n\r\n## Felhantering\r\nSkogsstyrelsen API använder standard HTTP-statuskoder för att indikera fel.<br />\r\nYtterligare felbeskrivning fås i svarsmeddelandet.\r\n\r\n| Statuskod | Beskrivning |\r\n| ----------- | ----------- |\r\n| 400 | `BadRequest` Felaktigt format på anrop. |\r\n| 401 | `Unauthorized` Obehörig att använda Skogsstyrelsen API. |\r\n| 404 | `Not Found` Kan inte hitta data som efterfrågas. |\r\n| 429 | `Too Many Requests` För många anrop inom tidsfönster, gränser retuneras i headers. |\r\n| 500 | `Internal Server Error` Internt fel i Skogsstyrelsen API. |\r\n\r\n## Geodata\r\nI Skogsstyrelsen anges geodata på formatet WKT. Skogsstyrelsen stöder endast koordinatsystemet SWEREF 99 TM.\r\n\r\n## OAuth 2.0\r\nSkogsstyrelsen API använder protokollet OAuth 2.0 för behörighetskontroll av alla anrop. För att kunna använda Skogsstyrelsen API måste en anropande applikation finnas registrerad i Skogsstyrelsen API. En registrerad applikation erhåller ett servicekonto med en unikt klient-id (ClientId) och en tillhörande privat nyckel (ClientSecret).\r\n\r\n## Server-till-server-flöde\r\nAutentisering sker med OAuth-flödet Client Credentials, ett autentiseringsflöde för server-till-server (Flödet är beskrivet i [RFC-65749](https://tools.ietf.org/html/rfc6749)). För att kunna använda ett API-anrop måste en anropande applikation först erhålla ett tillfälligt s.k. token som skickas med vid varje anrop. Ett token är giltigt under en begränsad tid, i Skogsstyrelsen APIs fall 60 minuter. Om ett API-anrop sker utan token eller med en ogiltig token, returnerar Skogsstyrelsen API HTTP-statuskoden `401Unauthorized (\"Message\": \"Authorization has been denied for this request.\").` Skogsstyrelsen API returnerar token på formatet JWT (JSON Web Token).\r\n\r\nFöljande anrop begär en ny token:  \r\n`POST https://auth.skogsstyrelsen.se/connect/token  \r\nContent-Type: application/x-www-form-urlencoded  \r\ngrant_type=client_credentials&client_id=YOUR_CLIENT_ID&client_secret=YOUR_CLIENT_SECRET J+s=&scope=sks_api`  \r\n\r\n| Parameter | Beskrivning |\r\n| ----------- | ----------- |\r\n| `client_id` | Applikationens klient-id (ClientId) |\r\n| `client_secret` | Applikationens privata nyckel (ClientSecret) |\r\n| `grant_type` | Typ av OAuth2 - flöde: Client Credentials.Värdet måste vara `client_credentials`. |\r\n| `scope` | Behörighetstyp. Värdet måste vara `sks_api`. |\r\n\r\n### Svar:\r\n```json\r\n{\r\n\"access_token\": TOKEN,  \r\n\"expires_in\": 3600,  \r\n\"token_type\": \"Bearer\",\r\n\"scope\":\"sks_api\"\r\n}\r\n```\r\n\r\nDet erhållna token-värdet används sedan i Authorization-headern i API-anropen:\r\n`Authorization: Bearer TOKEN`\r\n",
+    "version": "v1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.skogsstyrelsen.se/sksapi"
+    }
+  ],
+  "paths": {
+    "/raster/v1/scl/histogramdatesummary": {
+      "post": {
+        "tags": [
+          "Raster"
+        ],
+        "summary": "Visar datum då det finns Sentinel2 data över önskat område och tidsintervall.\nFör varje datum visas hur många 5x5 km av Lantmäteriets indexrutor som berörs samt uppskattad klassning av bra data.\nUppgiften om bra data baseras på uppgifterna i den Scene Classification Layer (mask skapad av ESA) som följer med Sentinel2.\nTill BraData räknas bilder med låg molnighet, lågt is- eller snötäcke och fritt från molnskuggor inom valt område.\nEtt högt värde tolkas som att området innehåller relativt klara bilder utan moln.",
+        "description": "Parametrar:\n\n'minDatum': Första datum i sökintervall (inclusive) anges som sträng tex '2020-06-06',  \n'maxDatum': Sista datum i sökintervall (inclusive) anges som sträng tex '2020-06-07',  \n'minTackningIndexruta':  Anger hur stor andel av varje ingående indexruta som minst ska täckas med bilder för att räknas med i resultatet. Tal 0.0-1.0.  \n'minBraData': Anger lägsta värde för BraData för att aktuellt datum ska räknas med i resultatet. Tal 0.0-0.99.  \n'extent': Begränsningsyta i WKT format som indexrutorna ska täcka. Anges som sträng.",
+        "operationId": "Raster_SclHistogramDateSummary",
+        "requestBody": {
+          "x-name": "sclHistogramDateSummaryParameters",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SclHistogramDateSummaryParameters"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SclHistogramDateSummaryDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/raster/v1/SclHistogramByBkid": {
+      "post": {
+        "tags": [
+          "Raster"
+        ],
+        "summary": "Returnerar sclhistogram för angiven 5km indexruta enligt Lantmäteriets klassning. \nSökparametrar:\n'BkId' avser Lantmäteriets standardbeteckning för 5km indexruta\n'MinDatum' (inclusive) och 'MaxDatum' (exclusive) anger sökintervall för bilddata.\n'MinTackningIndexruta' anger hur stor del av indexrutan som minst ska vara täckt av bilddata för att datumet ska inkluderas i resultatet\n'MinBraData' anger hur stor del av den tillgängliga bilddatan inom indexrutan som är klassat som bra data. Uppgiften om bra data baseras på uppgifterna i den Scene Classification Layer (mask skapad av ESA) som följer med Sentinel2 Level-2A.\nTill bra data räknas bilder med låg molnighet, lågt is- eller snötäcke och fritt från molnskuggor inom valt område.\nEtt högt värde tolkas som att indexrutan innehåller relativt klara bilder utan moln. Observera att denna parameter inte tar hänsyn till hur mycket data det finns i indexrutan utan bara klassningen.",
+        "operationId": "Raster_SuggestedFramesByBkid5km",
+        "requestBody": {
+          "x-name": "sclHistogramSearchParams",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SclHistogramSuggestedFramesSearchParameters"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "Lista med tillgängliga datum sorterad på 'BraData' i fallande ordning.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SclHistogramDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/raster/v1/api-info": {
+      "get": {
+        "tags": [
+          "Raster"
+        ],
+        "summary": "Returnerar information om detta API.\napiName: Namn på API\napiVersion: API-version med MAJOR, MINOR och PATCH version\napiReleased: Datum som denna API-version publicerades\napiDocumentation: En länk till aktuell API dokumentation.Om API:et består av flera delar (t.ex.flera webbsidor) bör en samlingsplats skapas för alla delar skapas där alla delar är åtkomliga via länkar eller liknande.\napiStatus: Visar API:ets tillstånd eller status enligt livscykelhantering längre ned på denna sida.T.ex.beta, active eller deprecated.\nOvan information ska anges, men ytterligare attribut och värden kan läggas till om önskas.",
+        "operationId": "Raster_ApiInfo",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SclHistogramDateSummaryDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "datum": {
+            "type": "string",
+            "description": "Datum - datum då det finns data från Sentinel2.",
+            "format": "date-time"
+          },
+          "antalIndexrutor": {
+            "type": "integer",
+            "description": "AntalIndexrutor - antal indexrutor inom extent med data från Sentinel2 för aktuellt datum.",
+            "format": "int32"
+          },
+          "maxAntalIndexrutor": {
+            "type": "integer",
+            "description": "MaxantalIndexrutor - antal indexrutor inom extent med data från Sentinel2 för alla datum i datumintervallet.",
+            "format": "int32"
+          },
+          "tackning": {
+            "type": "number",
+            "description": "Coverage - andel indexrutor av max antal som täcks för aktuellt datum.",
+            "format": "double"
+          },
+          "summaBraData": {
+            "type": "number",
+            "description": "SumBraData - summan BraData för alla indexrutor för aktuellt datum.",
+            "format": "double"
+          },
+          "genomsnittligBraData": {
+            "type": "number",
+            "description": "AvgBraData - medeltal för andel BraData per indexruta för aktuellt datum.",
+            "format": "double"
+          }
+        }
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "additionalProperties": {
+          "nullable": true
+        },
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          },
+          "extensions": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        }
+      },
+      "SclHistogramDateSummaryParameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "minDatum": {
+            "type": "string",
+            "description": "minDatum - Första datum för sökning. Valfri, om uppgiften lämnas blank görs sökning bland alla bilder som finns lagrade hos Skogsstyrelsen.",
+            "format": "date-time",
+            "nullable": true,
+            "example": "2017-07-01T12:00:00.000Z"
+          },
+          "maxDatum": {
+            "type": "string",
+            "description": "maxDatum - Sista datum för sökning. Valfri, om uppgiften lämnas blank görs sökning fram till dagens datum. Datumformat: yyyy-MM-dd",
+            "format": "date-time",
+            "nullable": true
+          },
+          "minTackningIndexruta": {
+            "type": "number",
+            "description": "MinTackningIndexRuta - Anger hur stor andel av varje ingående indexruta som minst måste överlappa med området ska täckas med bilder för att räknas med i resultatet. Tal 0.0-1.0.",
+            "format": "float",
+            "nullable": true
+          },
+          "minTackning": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "minAnvandbarData": {
+            "type": "number",
+            "description": "MinBraData - Anger lägsta värde för BraData för att aktuellt datum ska räknas med i resultatet. Tal 0.0-0.99.",
+            "format": "float",
+            "nullable": true
+          },
+          "extent": {
+            "type": "string",
+            "description": "Polygon i WKT-format med koordinatsystem SWEREF 99 TM. Obligatorisk och skrivs in som en sträng. \\\"POLYGON ((485000 6395000, 490000 6395000, 490000 6390000, 485000 6390000, 485000 6395000))\\\"",
+            "nullable": true,
+            "example": "POLYGON ((485000 6395000, 490000 6395000, 490000 6390000, 485000 6390000, 485000 6395000))"
+          }
+        }
+      },
+      "SclHistogramDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "bk": {
+            "type": "string",
+            "nullable": true
+          },
+          "datum": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "braData": {
+            "type": "number",
+            "format": "double"
+          },
+          "counts": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pixelSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "indexFramePixelCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "indexFrameCoverage": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "SclHistogramSuggestedFramesSearchParameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "minDatum": {
+            "type": "string",
+            "description": "Första datum i sökintervall",
+            "format": "date-time",
+            "example": "2022-05-01"
+          },
+          "maxDatum": {
+            "type": "string",
+            "description": "Sista datum i sökintervall",
+            "format": "date-time",
+            "example": "2022-07-01"
+          },
+          "minTackningIndexruta": {
+            "type": "number",
+            "description": "Hur mycket av indexrutan ska vara täckt med data\n ",
+            "format": "float",
+            "nullable": true,
+            "example": 0.9
+          },
+          "bkId": {
+            "type": "string",
+            "description": "Indexrutans (5x5 km) BkId enligt Lantmäteriets standard",
+            "nullable": true,
+            "example": "701_48_50"
+          },
+          "minBraData": {
+            "type": "number",
+            "description": "Minsta andel av den tillgängliga bilddatan inom indexrutan ska vara klassad som bra data",
+            "format": "float",
+            "nullable": true,
+            "example": 0.9
+          }
+        }
+      },
+      "ApiInfo": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "apiName": {
+            "type": "string",
+            "nullable": true
+          },
+          "apiVersion": {
+            "type": "string",
+            "nullable": true
+          },
+          "apiReleased": {
+            "type": "string",
+            "nullable": true
+          },
+          "apiDocumentation": {
+            "type": "string",
+            "nullable": true
+          },
+          "apiStatus": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "type": "oauth2",
+        "description": "OAuth2",
+        "flows": {
+          "clientCredentials": {
+            "authorizationUrl": "https://auth.skogsstyrelsen.se/connect/authorize",
+            "tokenUrl": "https://auth.skogsstyrelsen.se/connect/token",
+            "scopes": {
+              "sks_api": "Access Skogsstyrelsen API"
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "bearer": []
+    }
+  ]
+}

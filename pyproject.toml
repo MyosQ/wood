@@ -1,0 +1,49 @@
+[project]
+name = "skog-api"
+version = "0.1.0"
+description = "Skogsstyrelsen API Gateway - FastAPI backend for Swedish Forestry Agency APIs"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.120.0",
+    "httpx>=0.28.1",
+    "pydantic-settings>=2.11.0",
+    "python-dotenv>=1.1.1",
+    "uvicorn>=0.38.0",
+]
+
+[project.scripts]
+skog-api = "backend.main:main"
+
+[tool.setuptools]
+packages = ["backend"]
+
+[tool.uv]
+dev-dependencies = [
+    "httpx>=0.28.1",
+    "pytest>=8.4.2",
+    "pytest-asyncio>=1.2.0",
+    "pytest-cov>=7.0.0",
+]
+package = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+source = ["backend"]
+omit = ["tests/*", "**/__pycache__/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]

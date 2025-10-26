@@ -1,0 +1,1830 @@
+{
+  "x-generator": "NSwag v14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))",
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Skogsstyrelsens Abin API v2.0",
+    "description": "## Schema\r\nAlla anrop måste ske över HTTPS. All data till och från Skogsstyrelsen API är JSON.  \r\nAlla datum i Skogsstyrelsen API anges på formatet ISO 8601.  \r\n`YYYY-MM-DDTHH:MM:SS`\r\n\r\n## HTTP-verb\r\nSkogsstyrelsen API använder standard HTTP-verb för alla anrop.\r\n\r\n| Verb | Beskrivning |\r\n| ----------- | ----------- |\r\n| GET | Används för att hämta data. |\r\n| POST | Används för att hämta data med geometrier (WKT) som parameter |\r\n\r\n## Felhantering\r\nSkogsstyrelsen API använder standard HTTP-statuskoder för att indikera fel.<br />\r\nYtterligare felbeskrivning fås i svarsmeddelandet.\r\n\r\n| Statuskod | Beskrivning |\r\n| ----------- | ----------- |\r\n| 400 | `BadRequest` Felaktigt format på anrop. |\r\n| 401 | `Unauthorized` Obehörig att använda Skogsstyrelsen API. |\r\n| 404 | `Not Found` Kan inte hitta data som efterfrågas. |\r\n| 429 | `Too Many Requests` För många anrop inom tidsfönster, gränser retuneras i headers. |\r\n| 500 | `Internal Server Error` Internt fel i Skogsstyrelsen API. |\r\n\r\n## Geodata\r\nI Skogsstyrelsen anges geodata på formatet WKT. Skogsstyrelsen stöder endast koordinatsystemet SWEREF 99 TM.\r\n\r\n## OAuth 2.0\r\nSkogsstyrelsen API använder protokollet OAuth 2.0 för behörighetskontroll av alla anrop. För att kunna använda Skogsstyrelsen API måste en anropande applikation finnas registrerad i Skogsstyrelsen API. En registrerad applikation erhåller ett servicekonto med en unikt klient-id (ClientId) och en tillhörande privat nyckel (ClientSecret).\r\n\r\n## Server-till-server-flöde\r\nAutentisering sker med OAuth-flödet Client Credentials, ett autentiseringsflöde för server-till-server (Flödet är beskrivet i [RFC-65749](https://tools.ietf.org/html/rfc6749)). För att kunna använda ett API-anrop måste en anropande applikation först erhålla ett tillfälligt s.k. token som skickas med vid varje anrop. Ett token är giltigt under en begränsad tid, i Skogsstyrelsen APIs fall 60 minuter. Om ett API-anrop sker utan token eller med en ogiltig token, returnerar Skogsstyrelsen API HTTP-statuskoden `401Unauthorized (\"Message\": \"Authorization has been denied for this request.\").` Skogsstyrelsen API returnerar token på formatet JWT (JSON Web Token).\r\n\r\nFöljande anrop begär en ny token:  \r\n`POST https://auth.skogsstyrelsen.se/connect/token  \r\nContent-Type: application/x-www-form-urlencoded  \r\ngrant_type=client_credentials&client_id=YOUR_CLIENT_ID&client_secret=YOUR_CLIENT_SECRET J+s=&scope=sks_api`  \r\n\r\n| Parameter | Beskrivning |\r\n| ----------- | ----------- |\r\n| `client_id` | Applikationens klient-id (ClientId) |\r\n| `client_secret` | Applikationens privata nyckel (ClientSecret) |\r\n| `grant_type` | Typ av OAuth2 - flöde: Client Credentials.Värdet måste vara `client_credentials`. |\r\n| `scope` | Behörighetstyp. Värdet måste vara `sks_api`. |\r\n\r\n### Svar:\r\n```json\r\n{\r\n\"access_token\": TOKEN,  \r\n\"expires_in\": 3600,  \r\n\"token_type\": \"Bearer\",\r\n\"scope\":\"sks_api\"\r\n}\r\n```\r\n\r\nDet erhållna token-värdet används sedan i Authorization-headern i API-anropen:\r\n`Authorization: Bearer TOKEN`\r\n",
+    "version": "v2.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.skogsstyrelsen.se/sksapi"
+    }
+  ],
+  "paths": {
+    "/abin/v2/helalandet": {
+      "get": {
+        "tags": [
+          "Abin"
+        ],
+        "summary": "Inventeringsresultatet för Skoglig betesinventering för hela landet.",
+        "operationId": "Abin_SammanfattningHelaLandet",
+        "responses": {
+          "200": {
+            "description": "Lista med inventeringsresultat. Listan är sorterad efter inventeringsår. Foderprognos läggs endast till i den första inventeringen.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AbinResultDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/abin/v2/landsdel/{landsdelkod}": {
+      "get": {
+        "tags": [
+          "Abin"
+        ],
+        "summary": "Inventeringsresultatet för Skoglig betesinventering för angiven landsdel.",
+        "operationId": "Abin_SammanfattningLandsel",
+        "parameters": [
+          {
+            "name": "landsdelkod",
+            "in": "path",
+            "required": true,
+            "description": "Landsdelskod - För att se tillgängliga landsdelskoder se /Abin/Landsdel/Metadata",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": "1"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista med inventeringsresultat. Listan är sorterad efter inventeringsår. Foderprognos läggs endast till i den första inventeringen.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AbinResultDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/abin/v2/lan/{lankod}": {
+      "get": {
+        "tags": [
+          "Abin"
+        ],
+        "summary": "Inventeringsresultatet för Skoglig betesinventering för angivet län.",
+        "operationId": "Abin_SammanfattningLan",
+        "parameters": [
+          {
+            "name": "lankod",
+            "in": "path",
+            "required": true,
+            "description": "Länkod - För att se tillgängliga länkoder se /Abin/Landsdel/{landsdelkod}/Lan/Metadata",
+            "schema": {
+              "type": "string",
+              "default": "25"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista med inventeringsresultat. Listan är sorterad efter inventeringsår. Foderprognos läggs endast till i den första inventeringen.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AbinResultDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/abin/v2/lan/{lankod}/afo/{afonr}": {
+      "get": {
+        "tags": [
+          "Abin"
+        ],
+        "summary": "Inventeringsresultatet för Skoglig betesinventering för angivet älgförvaltningsområde.",
+        "operationId": "Abin_SammanfattningLanAfo",
+        "parameters": [
+          {
+            "name": "lankod",
+            "in": "path",
+            "required": true,
+            "description": "Länkod - För att se tillgängliga länkoder se /Abin/Landsdel/{landsdelkod}/Lan/Metadata",
+            "schema": {
+              "type": "string",
+              "default": "25"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "afonr",
+            "in": "path",
+            "required": true,
+            "description": "Äfonummer - För att se tillgänglia äfonummer se /Abin/Landsdel/{landsdelkod}/Lan/{lankod}/Afo/Metadata",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": "5"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista med inventeringsresultat. Listan är sorterad efter inventeringsår. Foderprognos läggs endast till i den första inventeringen.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AbinResultDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/abin/v2/lan/{lankod}/afo/{afonr}/stratum/{delomradesnummer}": {
+      "get": {
+        "tags": [
+          "Abin"
+        ],
+        "summary": "Inventeringsresultatet för Skoglig betesinventering för angivet delområde/stratum.",
+        "operationId": "Abin_SammanfattningStratum",
+        "parameters": [
+          {
+            "name": "lankod",
+            "in": "path",
+            "required": true,
+            "description": "Länkod - För att se tillgängliga länkoder se /Abin/Landsdel/{landsdelkod}/Lan/Metadata",
+            "schema": {
+              "type": "string",
+              "default": "25"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "afonr",
+            "in": "path",
+            "required": true,
+            "description": "Äfonummer - För att se tillgänglia äfonummer se /Abin/Landsdel/{landsdelkod}/Lan/{lankod}/Afo/Metadata",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": "5"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "delomradesnummer",
+            "in": "path",
+            "required": true,
+            "description": "Delområdesnummer - För att se tillgänliga delområdesnummer se /Abin/Landsdel/{landsdelkod}/Lan/{lankod}/Afo/{afonr}/Stratum/Metadata",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": "1"
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista med inventeringsresultat. Listan är sorterad efter inventeringsår. Foderprognos läggs endast till i den första inventeringen.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AbinResultDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/abin/v2/helalandet/geometri": {
+      "get": {
+        "tags": [
+          "Abin"
+        ],
+        "summary": "Hämtar stratumytor/delområdesytor för hela landet.",
+        "operationId": "Abin_SammanfattningHelaLandetGeometri",
+        "responses": {
+          "200": {
+            "description": "Lista med WKT'er",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AbinGeometriDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/abin/v2/landsdel/{landsdelkod}/geometri": {
+      "get": {
+        "tags": [
+          "Abin"
+        ],
+        "summary": "Hämtar stratumytor/delområdesytor inom en landsdel.",
+        "operationId": "Abin_SammanfattningLandsdelGeometri",
+        "parameters": [
+          {
+            "name": "landsdelkod",
+            "in": "path",
+            "required": true,
+            "description": "Landsdelskod - För att se tillgängliga landsdelskoder se /Abin/Landsdel/Metadata",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": "1"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista med AbinGeometriDto, se dokumentation på schemat.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AbinGeometriDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/abin/v2/lan/{lankod}/geometri": {
+      "get": {
+        "tags": [
+          "Abin"
+        ],
+        "summary": "Hämtar stratumytor/delområdesytor och inventeringsrutor inom ett län.",
+        "operationId": "Abin_SammanfattningLanGeometri",
+        "parameters": [
+          {
+            "name": "lankod",
+            "in": "path",
+            "required": true,
+            "description": "Länkod - För att se tillgängliga länkoder se /Abin/Landsdel/{landsdelkod}/Lan/Metadata",
+            "schema": {
+              "type": "string",
+              "default": "25"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista med AbinGeometriDto, se dokumentation på schemat.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AbinGeometriDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/abin/v2/lan/{lankod}/afo/{afonr}/geometri": {
+      "get": {
+        "tags": [
+          "Abin"
+        ],
+        "summary": "Hämtar stratumytor/delområdesytor och inventeringsrutor inom ett älgförvaltningsområde.",
+        "operationId": "Abin_SammanfattningAfoGeometri",
+        "parameters": [
+          {
+            "name": "lankod",
+            "in": "path",
+            "required": true,
+            "description": "Länkod - För att se tillgängliga länkoder se /Abin/Landsdel/{landsdelkod}/Lan/Metadata",
+            "schema": {
+              "type": "string",
+              "default": "25"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "afonr",
+            "in": "path",
+            "required": true,
+            "description": "Äfonummer - För att se tillgänglia äfonummer se /Abin/Landsdel/{landsdelkod}/Lan/{lankod}/Afo/Metadata",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": "5"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista med AbinGeometriDto, se dokumentation på schemat.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AbinGeometriDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/abin/v2/lan/{lankod}/afo/{afonr}/stratum/{delomradesnummer}/geometri": {
+      "get": {
+        "tags": [
+          "Abin"
+        ],
+        "summary": "Hämtar stratumytor/delområdesytor och inventeringsrutor inom ett älgförvaltningsområde.",
+        "operationId": "Abin_SammanfattningStratumGeometri",
+        "parameters": [
+          {
+            "name": "lankod",
+            "in": "path",
+            "required": true,
+            "description": "Länkod - För att se tillgängliga länkoder se /Abin/Landsdel/{landsdelkod}/Lan/Metadata",
+            "schema": {
+              "type": "string",
+              "default": "25"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "afonr",
+            "in": "path",
+            "required": true,
+            "description": "Äfonummer - För att se tillgänglia äfonummer se /Abin/Landsdel/{landsdelkod}/Lan/{lankod}/Afo/Metadata",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": "5"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "delomradesnummer",
+            "in": "path",
+            "required": true,
+            "description": "Delområdesnummer - För att se tillgänliga delområdesnummer se /Abin/Landsdel/{landsdelkod}/Lan/{lankod}/Afo/{afonr}/Stratum/Metadata",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": "1"
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista med AbinGeometriDto, se dokumentation på schemat.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AbinGeometriDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/abin/v2/landsdel/metadata": {
+      "get": {
+        "tags": [
+          "Abin"
+        ],
+        "operationId": "Abin_GetMetadataLandsdelar",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AbinMetadataDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/abin/v2/landsdel/{landsdelkod}/lan/metadata": {
+      "get": {
+        "tags": [
+          "Abin"
+        ],
+        "summary": "Hämtar vilka län som finns inom en landsdel",
+        "operationId": "Abin_GetMetadataLan",
+        "parameters": [
+          {
+            "name": "landsdelkod",
+            "in": "path",
+            "required": true,
+            "description": "Landsdelskod - För att se tillgängliga landsdelskoder se /Abin/Landsdel/Metadata",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": "1"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Namn - Länsnamn, Kod - Lankod",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AbinMetadataDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/abin/v2/landsdel/{landsdelkod}/lan/{lankod}/afo/metadata": {
+      "get": {
+        "tags": [
+          "Abin"
+        ],
+        "summary": "Hämtar vilka älgförvaltningar som finns inom en län",
+        "operationId": "Abin_GetMetadataAfo",
+        "parameters": [
+          {
+            "name": "landsdelkod",
+            "in": "path",
+            "required": true,
+            "description": "Landsdelskod - För att se tillgängliga landsdelskoder se /Abin/Landsdel/Metadata",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": "1"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "lankod",
+            "in": "path",
+            "required": true,
+            "description": "Länkod - För att se tillgängliga länkoder se /Abin/Landsdel/{landsdelkod}/Lan/Metadata",
+            "schema": {
+              "type": "string",
+              "default": "25"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Namn - Älgförvaltningsnamn, Kod - Afonr",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AbinMetadataDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/abin/v2/landsdel/{landsdelkod}/lan/{lankod}/afo/{afonr}/stratum/metadata": {
+      "get": {
+        "tags": [
+          "Abin"
+        ],
+        "summary": "Hämtar vilka stratum/delområden som finns inom ett älgförvaltningsområde",
+        "operationId": "Abin_GetMetadataStratum",
+        "parameters": [
+          {
+            "name": "landsdelkod",
+            "in": "path",
+            "required": true,
+            "description": "Landsdelskod - För att se tillgängliga landsdelskoder se /Abin/Landsdel/Metadata",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": "1"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "lankod",
+            "in": "path",
+            "required": true,
+            "description": "Länkod - För att se tillgängliga länkoder se /Abin/Landsdel/{landsdelkod}/Lan/Metadata",
+            "schema": {
+              "type": "string",
+              "default": "25"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "afonr",
+            "in": "path",
+            "required": true,
+            "description": "Äfonummer - För att se tillgänglia äfonummer se /Abin/Landsdel/{landsdelkod}/Lan/{lankod}/Afo/Metadata",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": "5"
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Namn - Delområdesnamn, Kod - Delomradesnummer",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AbinMetadataDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/abin/v2/api-info": {
+      "get": {
+        "tags": [
+          "Abin"
+        ],
+        "summary": "Returnerar information om detta API.\napiName: Namn på API\napiVersion: API-version med MAJOR, MINOR och PATCH version\napiReleased: Datum som denna API-version publicerades\napiDocumentation: En länk till aktuell API dokumentation.Om API:et består av flera delar (t.ex.flera webbsidor) bör en samlingsplats skapas för alla delar skapas där alla delar är åtkomliga via länkar eller liknande.\napiStatus: Visar API:ets tillstånd eller status enligt livscykelhantering längre ned på denna sida.T.ex.beta, active eller deprecated.\nOvan information ska anges, men ytterligare attribut och värden kan läggas till om önskas.",
+        "operationId": "Abin_ApiInfo",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AbinResultDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "landsdelKod": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "landsdelNamn": {
+            "type": "string",
+            "nullable": true
+          },
+          "lanKod": {
+            "type": "string",
+            "nullable": true
+          },
+          "lanNamn": {
+            "type": "string",
+            "nullable": true
+          },
+          "afoNr": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "afoNamn": {
+            "type": "string",
+            "nullable": true
+          },
+          "delomrNr": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "delomrNamn": {
+            "type": "string",
+            "nullable": true
+          },
+          "invAr": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "antalAFODelomr": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "entreprenor": {
+            "type": "string",
+            "nullable": true
+          },
+          "skattningsTyp": {
+            "type": "string",
+            "nullable": true
+          },
+          "antalRutor": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "antalBestand": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "antalYtorIngar": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "antalytorIngar3InvMedel": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "medelbestandshojd": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "medelbestandshojd3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "bestandAlder": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "bestandAlder3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "andelRojt": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "andelRojt3InvMedel": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "arsskadaTallAndel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "arsskadaTallAndel3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "medelfelArskadaTall": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "medelfelArskadaTall3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "oskadadTallAndel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "oskadadTallAndel3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "medelfelOskadadTall": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "medelfelOskadadTall3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "arsskadaGranAndel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "arsskadaGranAndel3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "medelfelArskadaGran": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "medelfelArskadaGran3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "vinterSkadaTallAndel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "sommarSkadaTallAndel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "sommarVinterSkadaTallAndel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "vinterSkadaTallAndel3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "sommarSkadaTallAndel3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "sommarVinterSkadaTallAndel3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "raseAndelForekomst": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "raseAndelForekomst3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "raseAndelEjForekomst": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "raseAndelGynnsam": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "raseAndelGynnsam3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "antalTallarHa": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "antalGranarHa": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "antalBjorkarHa": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "antalOvrigtHa": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "antalRASEHa": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "antalRASEGynnsamHa": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "antalStammarHa": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "antalTallarHa3InvAVG": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "antalGranarHa3InvAVG": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "antalBjorkarHa3InvAVG": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "antalOvrigtHa3InvAVG": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "antalRASEHa3InvAVG": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "antalRASEGynnsamHa3InvAVG": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "antalStammarHa3InvAVG": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "antalTallarForyngTallHa3InvAVG": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "antalGranarForyngTallHa3InvAVG": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "antalBjorkarForyngTallHa3InvAVG": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "antalOvrigtForyngTallHa3InvAVG": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "antalRASEForyngTallHa3InvAVG": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "antalRASEGynnsamForyngTallHa3InvAVG": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "antalStammarForyngTallHa3InvAVG": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "antalTallarForyngGranHa3InvAVG": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "antalGranarForyngGranHa3InvAVG": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "antalBjorkarForyngGranHa3InvAVG": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "antalOvrigtForyngGranHa3InvAVG": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "antalRASEForyngGranHa3InvAVG": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "antalRASEGynnsamForyngGranHa3InvAVG": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "antalStammarForyngGranHa3InvAVG": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelMagraMarkerMedTall": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelMagraMarkerMedGran": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelMagraMarkerMedBjork": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelMagraMarkerMedLark": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelMagraMarkerMedContorta": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelMagraMarkerMedOvrigt": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelMagraMarkerMedIngenAtgard": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "andelMargraMarker": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelMellanMarkerMedTall": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelMellanMarkerMedGran": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelMellanMarkerMedBjork": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelMellanMarkerMedLark": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelMellanMarkerMedContorta": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelMellanMarkerMedOvrigt": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelMellanMarkerMedIngenAtgard": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "andelMellanMarker": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelBordigaMarkerMedTall": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelBordigaMarkerMedGran": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelBordigaMarkerMedBjork": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelBordigaMarkerMedLark": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelBordigaMarkerMedContorta": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelBordigaMarkerMedOvrigt": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelBordigaMarkerMedIngenAtgard": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "andelBordigaMarker": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "andelMagraMarker3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "andelMellanMarker3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "andelBordigaMarker3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "magerHa_3InvMedel": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "mellanHa_3InvMedel": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "bordigHa_3InvMedel": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "standortsanpassningAndelMagraMarkerMedTall3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelMagraMarkerMedGran3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelMagraMarkerMedBjork3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelMagraMarkerMedLark3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelMagraMarkerMedContorta3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelMagraMarkerMedOvrigt3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelMagraMarkerMedIngenAtgard3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelMellanMarkerMedTall3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelMellanMarkerMedGran3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelMellanMarkerMedBjork3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelMellanMarkerMedLark3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelMellanMarkerMedContorta3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelMellanMarkerMedOvrigt3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelMellanMarkerMedIngenAtgard3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelBordigaMarkerMedTall3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelBordigaMarkerMedGran3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelBordigaMarkerMedBjork3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelBordigaMarkerMedLark3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelBordigaMarkerMedContorta3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelBordigaMarkerMedOvrigt3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "standortsanpassningAndelBordigaMarkerMedIngenAtgard3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "medelfelAndelMagraMarkerMedTall": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "medelfelAndelMagraMarkerMedTall_3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "medelfelAndelMellanMarkerMedTall": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "medelfelAndelMellanMarkerMedTall_3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "medelfelAndelBordigaMarkerMedTall": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "medelfelAndelBordigaMarkerMedTall_3InvMedel": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "tallarAntal": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "granarViktad": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "totalArealHa": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "arealVattenHa": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "arealLandHa": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "arealEjSkogHa": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "arealSkogsmarkHa": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "myrmark": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "ovrigOppenMark": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "tatortsmark": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "standortsindexTallMarker": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "foderprognosHa": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "foderprognosAndring": {
+            "type": "string",
+            "nullable": true
+          },
+          "tallUngskogHaRT": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "granUngskogHaRT": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "barrblandUngskogHaRT": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "ovrigtUngskogHaRT": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "tallAldreskogHaRT": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "granAldreskogHaRT": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "barrblandAldreskogHaRT": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "ovrigtAldreskogHaRT": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "tallskogHaRT": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "granskogHaRT": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "barrblandskogHaRT": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "ovrigtskogHaRT": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "tallskogHaABIN": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "granskogHaABIN": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "barrblandskogHaABIN": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "ovrigskogHaABIN": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "tallskogHaABIN3InvMedel": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "granskogHaABIN3InvMedel": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "bblandskogHaABIN3InvMedel": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "ovrigskogHaABIN3InvMedel": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "foryngratTradslagTall": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "foryngratTradslagGran": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "foryngratTradslagContorta": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "foryngratTradslagBjork": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "foryngratTradslagLark": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "foryngratTradslagOvrigt": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "foryngratTradslagIngen": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "foryngTallHa3InvMedel": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "foryngGranHa3InvMedel": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "foryngContortaHa3InvMedel": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "foryngBjorkHa3InvMedel": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "foryngLarkHa3InvMedel": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "foryngOvrigtHa3InvMedel": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "foryngIngenHa3InvMedel": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "slutsatsArsskadaTallText": {
+            "type": "string",
+            "nullable": true
+          },
+          "slutsatsArsskadaTallInt": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "kommentarArsskadaTallTrend": {
+            "type": "string",
+            "nullable": true
+          },
+          "malArsskador": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "slutsatsOskadadTallText": {
+            "type": "string",
+            "nullable": true
+          },
+          "slutsatsOskadadTallInt": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "malOskadad": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "slutsatsArsskadaGranText": {
+            "type": "string",
+            "nullable": true
+          },
+          "slutsatsArsskadaGranInt": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "slutsatsTallpaMagraMarkerText": {
+            "type": "string",
+            "nullable": true
+          },
+          "slutsatsTallpaMagraMarkerInt": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "slutsatsTallpaMellanMarkerText": {
+            "type": "string",
+            "nullable": true
+          },
+          "slutsatsTallpaMellanMarkerInt": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "slutsatsRASEGynText": {
+            "type": "string",
+            "nullable": true
+          },
+          "slutsatsRASEGynInt": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "foderprognos": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/AbinFoderprognosDto"
+            }
+          }
+        }
+      },
+      "AbinFoderprognosDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "ar": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "foderprognos": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "AbinGeometriDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "senasteInventeringsrutor": {
+            "type": "array",
+            "description": "Innehåller inventeringsrutorna för den senaste inventeringen i det efterfrågade området.",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/AbinInventeringsRutorDto"
+            }
+          },
+          "foregaendeInventeringsrutor": {
+            "type": "array",
+            "description": "Innehåller inventeringsrutor för de föregående inventeringarna i det efterfrågade området.",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/AbinInventeringsRutorDto"
+            }
+          },
+          "stratumytor": {
+            "type": "array",
+            "description": "Innehåller stratumytorna i det efterfrågade området.",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/AbinStratumYtaDto"
+            }
+          }
+        }
+      },
+      "AbinInventeringsRutorDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "wkt": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "AbinStratumYtaDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "wkt": {
+            "type": "string",
+            "nullable": true
+          },
+          "afoNamn": {
+            "type": "string",
+            "nullable": true
+          },
+          "afoNummer": {
+            "type": "string",
+            "nullable": true
+          },
+          "stratumId": {
+            "type": "string",
+            "nullable": true
+          },
+          "delomradesnummer": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "delomradesnamn": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "AbinMetadataDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "namn": {
+            "type": "string",
+            "nullable": true
+          },
+          "kod": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "additionalProperties": {
+          "nullable": true
+        },
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          },
+          "extensions": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        }
+      },
+      "ApiInfo": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "apiName": {
+            "type": "string",
+            "nullable": true
+          },
+          "apiVersion": {
+            "type": "string",
+            "nullable": true
+          },
+          "apiReleased": {
+            "type": "string",
+            "nullable": true
+          },
+          "apiDocumentation": {
+            "type": "string",
+            "nullable": true
+          },
+          "apiStatus": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "type": "oauth2",
+        "description": "OAuth2",
+        "flows": {
+          "clientCredentials": {
+            "authorizationUrl": "https://auth.skogsstyrelsen.se/connect/authorize",
+            "tokenUrl": "https://auth.skogsstyrelsen.se/connect/token",
+            "scopes": {
+              "sks_api": "Access Skogsstyrelsen API"
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "bearer": []
+    }
+  ]
+}
