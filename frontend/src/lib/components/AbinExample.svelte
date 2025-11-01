@@ -3,11 +3,11 @@
   import { COUNTIES } from '../examples';
   import { ApiException } from '../api';
 
-  let loading = false;
-  let error = '';
-  let nationalResult: any = null;
-  let countyResult: any = null;
-  let selectedCounty = COUNTIES.STOCKHOLM;
+  let loading = $state(false);
+  let error = $state('');
+  let nationalResult: any = $state(null);
+  let countyResult: any = $state(null);
+  let selectedCounty = $state(COUNTIES.STOCKHOLM);
 
   async function fetchBrowsingData() {
     loading = true;
@@ -38,16 +38,19 @@
   }
 </script>
 
-<div class="example-card">
-  <h2>Browsing Inventory Example</h2>
-  <p class="description">
+<div class="rounded-lg border border-border bg-surface p-6 shadow-md">
+  <h2 class="text-xl font-semibold text-primary">Browsing Inventory Example</h2>
+  <p class="mt-2 text-text-secondary">
     View browsing damage statistics from moose and deer inventory (ABIN).
   </p>
 
-  <div class="controls">
-    <label>
-      County:
-      <select bind:value={selectedCounty}>
+  <div class="mt-4 flex flex-wrap items-end gap-4">
+    <label class="flex flex-col gap-2">
+      <span class="font-medium text-text-primary">County:</span>
+      <select
+        bind:value={selectedCounty}
+        class="rounded-lg border border-border bg-background px-3 py-2 text-text-primary transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      >
         <option value={COUNTIES.STOCKHOLM}>Stockholm</option>
         <option value={COUNTIES.UPPSALA}>Uppsala</option>
         <option value={COUNTIES.SODERMANLAND}>Södermanland</option>
@@ -59,196 +62,96 @@
       </select>
     </label>
 
-    <button on:click={fetchBrowsingData} disabled={loading} class="fetch-btn">
+    <button
+      onclick={fetchBrowsingData}
+      disabled={loading}
+      class="rounded-lg bg-primary px-6 py-3 font-medium text-white transition-colors hover:bg-primary-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-primary"
+    >
       {loading ? 'Loading...' : 'Fetch Browsing Data'}
     </button>
   </div>
 
   {#if error}
-    <div class="error-box">{error}</div>
+    <div class="mt-4 rounded-lg border border-error-border bg-error-bg p-4 text-error-text">
+      {error}
+    </div>
   {/if}
 
   {#if nationalResult}
-    <div class="result-section">
-      <h3>National Summary (Most Recent)</h3>
-      <div class="metric">
-        <strong>Area:</strong>
-        <span>{nationalResult.omrade || 'Hela landet'}</span>
+    <div class="mt-6 rounded-lg bg-background p-4 border border-border">
+      <h3 class="mb-3 text-lg font-medium text-text-primary">National Summary (Most Recent)</h3>
+      <div class="border-b border-border py-3">
+        <span class="inline-block min-w-[180px] font-semibold text-text-primary">Area:</span>
+        <span class="ml-4 font-semibold text-primary">{nationalResult.omrade || 'Hela landet'}</span>
       </div>
-      <div class="metric">
-        <strong>Inventory Year:</strong>
-        <span>{nationalResult.inventeringsAr || nationalResult.invAr || 'N/A'}</span>
+      <div class="border-b border-border py-3">
+        <span class="inline-block min-w-[180px] font-semibold text-text-primary">Inventory Year:</span>
+        <span class="ml-4 font-semibold text-primary">{nationalResult.inventeringsAr || nationalResult.invAr || 'N/A'}</span>
       </div>
-      <div class="metric">
-        <strong>Number of Areas:</strong>
-        <span>{nationalResult.antalAFODelomr || 'N/A'}</span>
+      <div class="border-b border-border py-3">
+        <span class="inline-block min-w-[180px] font-semibold text-text-primary">Number of Areas:</span>
+        <span class="ml-4 font-semibold text-primary">{nationalResult.antalAFODelomr || 'N/A'}</span>
       </div>
-      <div class="metric">
-        <strong>Number of Grids:</strong>
-        <span>{nationalResult.antalRutor || 'N/A'}</span>
+      <div class="border-b border-border py-3">
+        <span class="inline-block min-w-[180px] font-semibold text-text-primary">Number of Grids:</span>
+        <span class="ml-4 font-semibold text-primary">{nationalResult.antalRutor || 'N/A'}</span>
       </div>
-      <div class="metric">
-        <strong>Pine Damage (Annual):</strong>
-        <span>{nationalResult.arsskadaTallAndel ? (nationalResult.arsskadaTallAndel * 100).toFixed(1) + '%' : 'N/A'}</span>
+      <div class="border-b border-border py-3">
+        <span class="inline-block min-w-[180px] font-semibold text-text-primary">Pine Damage (Annual):</span>
+        <span class="ml-4 font-semibold text-primary">{nationalResult.arsskadaTallAndel ? (nationalResult.arsskadaTallAndel * 100).toFixed(1) + '%' : 'N/A'}</span>
       </div>
-      <div class="metric">
-        <strong>Spruce Damage (Annual):</strong>
-        <span>{nationalResult.arsskadaGranAndel ? (nationalResult.arsskadaGranAndel * 100).toFixed(1) + '%' : 'N/A'}</span>
+      <div class="py-3">
+        <span class="inline-block min-w-[180px] font-semibold text-text-primary">Spruce Damage (Annual):</span>
+        <span class="ml-4 font-semibold text-primary">{nationalResult.arsskadaGranAndel ? (nationalResult.arsskadaGranAndel * 100).toFixed(1) + '%' : 'N/A'}</span>
       </div>
     </div>
   {/if}
 
   {#if countyResult}
-    <div class="result-section">
-      <h3>County: {countyResult.lanNamn || countyResult.omrade || 'Unknown'} (Most Recent)</h3>
-      <div class="metric">
-        <strong>Inventory Year:</strong>
-        <span>{countyResult.invAr || countyResult.inventeringsAr || 'N/A'}</span>
+    <div class="mt-6 rounded-lg bg-background p-4 border border-border">
+      <h3 class="mb-3 text-lg font-medium text-text-primary">County: {countyResult.lanNamn || countyResult.omrade || 'Unknown'} (Most Recent)</h3>
+      <div class="border-b border-border py-3">
+        <span class="inline-block min-w-[180px] font-semibold text-text-primary">Inventory Year:</span>
+        <span class="ml-4 font-semibold text-primary">{countyResult.invAr || countyResult.inventeringsAr || 'N/A'}</span>
       </div>
-      <div class="metric">
-        <strong>County Code:</strong>
-        <span>{countyResult.lanKod || countyResult.lankod || 'N/A'}</span>
+      <div class="border-b border-border py-3">
+        <span class="inline-block min-w-[180px] font-semibold text-text-primary">County Code:</span>
+        <span class="ml-4 font-semibold text-primary">{countyResult.lanKod || countyResult.lankod || 'N/A'}</span>
       </div>
-      <div class="metric">
-        <strong>Region:</strong>
-        <span>{countyResult.landsdelNamn || 'N/A'}</span>
+      <div class="border-b border-border py-3">
+        <span class="inline-block min-w-[180px] font-semibold text-text-primary">Region:</span>
+        <span class="ml-4 font-semibold text-primary">{countyResult.landsdelNamn || 'N/A'}</span>
       </div>
       {#if countyResult.antalAFODelomr}
-        <div class="metric">
-          <strong>Number of ÄFO Areas:</strong>
-          <span>{countyResult.antalAFODelomr}</span>
+        <div class="border-b border-border py-3">
+          <span class="inline-block min-w-[180px] font-semibold text-text-primary">Number of ÄFO Areas:</span>
+          <span class="ml-4 font-semibold text-primary">{countyResult.antalAFODelomr}</span>
         </div>
       {/if}
       {#if countyResult.antalRutor}
-        <div class="metric">
-          <strong>Number of Grids:</strong>
-          <span>{countyResult.antalRutor}</span>
+        <div class="border-b border-border py-3">
+          <span class="inline-block min-w-[180px] font-semibold text-text-primary">Number of Grids:</span>
+          <span class="ml-4 font-semibold text-primary">{countyResult.antalRutor}</span>
         </div>
       {/if}
       {#if countyResult.arsskadaTallAndel !== undefined}
-        <div class="metric">
-          <strong>Pine Damage (Annual):</strong>
-          <span>{(countyResult.arsskadaTallAndel * 100).toFixed(1)}%</span>
+        <div class="border-b border-border py-3">
+          <span class="inline-block min-w-[180px] font-semibold text-text-primary">Pine Damage (Annual):</span>
+          <span class="ml-4 font-semibold text-primary">{(countyResult.arsskadaTallAndel * 100).toFixed(1)}%</span>
         </div>
       {/if}
       {#if countyResult.arsskadaGranAndel !== undefined}
-        <div class="metric">
-          <strong>Spruce Damage (Annual):</strong>
-          <span>{(countyResult.arsskadaGranAndel * 100).toFixed(1)}%</span>
+        <div class="border-b border-border py-3">
+          <span class="inline-block min-w-[180px] font-semibold text-text-primary">Spruce Damage (Annual):</span>
+          <span class="ml-4 font-semibold text-primary">{(countyResult.arsskadaGranAndel * 100).toFixed(1)}%</span>
         </div>
       {/if}
       {#if countyResult.oskadadTallAndel !== undefined}
-        <div class="metric">
-          <strong>Undamaged Pine:</strong>
-          <span>{(countyResult.oskadadTallAndel * 100).toFixed(1)}%</span>
+        <div class="py-3">
+          <span class="inline-block min-w-[180px] font-semibold text-text-primary">Undamaged Pine:</span>
+          <span class="ml-4 font-semibold text-primary">{(countyResult.oskadadTallAndel * 100).toFixed(1)}%</span>
         </div>
       {/if}
     </div>
   {/if}
 </div>
-
-<style>
-  .example-card {
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .example-card h2 {
-    margin-top: 0;
-    color: #2c5f2d;
-    font-size: 1.3rem;
-  }
-
-  .description {
-    color: #666;
-    margin-bottom: 1rem;
-  }
-
-  .controls {
-    display: flex;
-    gap: 1rem;
-    align-items: flex-end;
-    margin-bottom: 1rem;
-  }
-
-  label {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    color: #333;
-    font-weight: 500;
-  }
-
-  select {
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1rem;
-  }
-
-  .fetch-btn {
-    background-color: #2c5f2d;
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.2s;
-  }
-
-  .fetch-btn:hover:not(:disabled) {
-    background-color: #1e4620;
-  }
-
-  .fetch-btn:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-  }
-
-  .error-box {
-    background-color: #f8d7da;
-    color: #721c24;
-    padding: 1rem;
-    border-radius: 4px;
-    margin-top: 1rem;
-    border: 1px solid #f5c6cb;
-  }
-
-  .result-section {
-    margin-top: 1.5rem;
-    padding: 1rem;
-    background-color: #f8f9fa;
-    border-radius: 4px;
-  }
-
-  .result-section h3 {
-    margin-top: 0;
-    color: #333;
-    font-size: 1.1rem;
-  }
-
-  .metric {
-    padding: 0.5rem 0;
-    border-bottom: 1px solid #e0e0e0;
-  }
-
-  .metric:last-child {
-    border-bottom: none;
-  }
-
-  .metric strong {
-    display: inline-block;
-    min-width: 180px;
-    color: #333;
-  }
-
-  .metric span {
-    margin-left: 1rem;
-    color: #2c5f2d;
-    font-weight: 600;
-  }
-</style>

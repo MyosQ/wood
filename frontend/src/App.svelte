@@ -3,10 +3,11 @@
   import { get, ApiException } from './lib/api';
   import GrunddataExample from './lib/components/GrunddataExample.svelte';
   import AbinExample from './lib/components/AbinExample.svelte';
+  import ThemeToggle from './lib/components/ThemeToggle.svelte';
 
-  let apiStatus = 'checking...';
-  let apiMessage = '';
-  let errorType = '';
+  let apiStatus = $state('checking...');
+  let apiMessage = $state('');
+  let errorType = $state('');
 
   onMount(async () => {
     try {
@@ -26,96 +27,56 @@
   });
 </script>
 
-<main>
-  <h1>Skogsstyrelsen API Client</h1>
+<div class="min-h-screen bg-background">
+  <main class="mx-auto max-w-5xl px-6 py-8">
+    <!-- Header with theme toggle -->
+    <div class="mb-8 flex items-center justify-between">
+      <h1 class="text-4xl font-bold text-primary">
+        Skogsstyrelsen API Client
+      </h1>
+      <ThemeToggle />
+    </div>
 
-  <div class="status-card">
-    <h2>Backend Status</h2>
-    <p class="status" class:connected={apiStatus === 'connected'} class:error={apiStatus === 'error'}>
-      {apiStatus}
-    </p>
-    {#if apiMessage}
-      <p class="message">{apiMessage}</p>
-    {/if}
-    {#if errorType && apiStatus === 'error'}
-      <p class="error-type">Error type: {errorType}</p>
-    {/if}
-  </div>
+    <!-- Status Card -->
+    <div class="mb-6 rounded-lg border border-border bg-surface p-6 shadow-md">
+      <h2 class="mb-4 text-xl font-semibold text-text-primary">
+        Backend Status
+      </h2>
 
-  <div class="info">
-    <p>Try the example components below to test the API integration!</p>
-  </div>
+      <span
+        role="status"
+        aria-live="polite"
+        class="inline-block rounded px-4 py-2 font-semibold border {apiStatus === 'connected'
+          ? 'bg-success-bg text-success-text border-success-border'
+          : apiStatus === 'error'
+          ? 'bg-error-bg text-error-text border-error-border'
+          : 'bg-surface text-text-secondary border-border'}"
+      >
+        {apiStatus}
+      </span>
 
-  <GrunddataExample />
-  <AbinExample />
-</main>
+      {#if apiMessage}
+        <p class="mt-4 text-text-secondary">{apiMessage}</p>
+      {/if}
 
-<style>
-  main {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
-    font-family: system-ui, -apple-system, sans-serif;
-  }
+      {#if errorType && apiStatus === 'error'}
+        <p class="mt-2 font-mono text-sm text-text-tertiary">
+          Error type: {errorType}
+        </p>
+      {/if}
+    </div>
 
-  h1 {
-    color: #2c5f2d;
-    margin-bottom: 2rem;
-  }
+    <!-- Info Banner -->
+    <div class="mb-6 rounded-lg border-l-4 border-primary bg-surface px-6 py-4">
+      <p class="text-text-secondary">
+        Try the example components below to test the API integration!
+      </p>
+    </div>
 
-  .status-card {
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
-
-  .status-card h2 {
-    margin-top: 0;
-    font-size: 1.2rem;
-    color: #333;
-  }
-
-  .status {
-    font-weight: bold;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    display: inline-block;
-  }
-
-  .status.connected {
-    background-color: #d4edda;
-    color: #155724;
-  }
-
-  .status.error {
-    background-color: #f8d7da;
-    color: #721c24;
-  }
-
-  .message {
-    margin-top: 1rem;
-    color: #666;
-  }
-
-  .info {
-    background-color: #f8f9fa;
-    border-left: 4px solid #2c5f2d;
-    padding: 1rem 1.5rem;
-    border-radius: 4px;
-  }
-
-  .info p {
-    margin: 0;
-    color: #555;
-  }
-
-  .error-type {
-    margin-top: 0.5rem;
-    font-size: 0.9rem;
-    color: #999;
-    font-family: monospace;
-  }
-</style>
+    <!-- Example Components -->
+    <div class="space-y-6">
+      <GrunddataExample />
+      <AbinExample />
+    </div>
+  </main>
+</div>

@@ -119,17 +119,37 @@ ALWAYS design reusable components with single responsibility
 
 
 ### Design Principles
+
+**Simplicity First**
+PREFER simplicity over complexity in all design decisions
+PREFER fewer elements over more elements
+PREFER removing features over adding features
+PREFER standard UI patterns over custom designs
+PREFER plain text over formatted text when possible
+PREFER whitespace over visual separators
+PREFER subtle over bold
+PREFER understated over attention-grabbing
+
+**Visual Hierarchy**
 PREFER clarity over decoration
 PREFER invisible UI - don't add chrome unless absolutely needed
-PREFER Minimalistic UI
+PREFER Minimalistic UI - every element must justify its existence
 PREFER subtle gradients over solid backgrounds
+PREFER removing visual noise over adding visual interest
+PREFER native browser controls over custom-styled controls
 
+**Functionality**
 ALWAYS Allow dark and light mode
 ALWAYS use semantic HTML
 ALWAYS provide visible focus states for keyboard navigation
 ALWAYS use ARIA attributes where semantic HTML isn't sufficient
+ALWAYS question if a feature is truly needed before implementing
 
+**Constraints**
 NEVER use `<div>` for interactive elements
+NEVER add decorative elements that don't serve user needs
+NEVER use animations unless they improve usability
+NEVER add complexity for aesthetic reasons alone
 
 #### Map Layout Patterns
 ALWAYS display map full width and full height of the viewing port. For example: `w-screen h-screen` or `w-full h-full`. Edit any parent container to allow this.
@@ -143,6 +163,19 @@ NEVER use side-by-side or split-screen layouts with the map
 - Light borders for definition
 - Smooth transitions and animations
 - Apply glassmorphism: `backdrop-blur-md bg-[var(--glass-bg)] border border-[var(--glass-border)]`
+
+### UI Review Checklist
+
+When reviewing UI implementations, prioritize these questions in order:
+
+1. **Can it be simpler?** - Remove elements, reduce complexity
+2. **Is every element necessary?** - Justify each component's existence
+3. **Can we use standard patterns?** - Avoid custom designs when possible
+4. **Is it accessible?** - WCAG compliance, keyboard navigation, ARIA
+5. **Does it work in both themes?** - Light and dark mode support
+6. **Are colors from CSS variables?** - No hardcoded colors
+7. **Is the hierarchy clear?** - Visual importance matches functional importance
+8. **Can animations be removed?** - Only keep if they improve usability
 
 
 ## Configuration

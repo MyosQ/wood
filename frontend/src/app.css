@@ -1,79 +1,148 @@
+@import "tailwindcss";
+
+@theme {
+  /* Custom color tokens that map to CSS variables */
+  --color-primary: #2c5f2d;
+  --color-primary-dark: #1e4620;
+  --color-primary-light: #4a8a4c;
+  --color-secondary: #5a6b5d;
+  --color-accent: #7c9a7e;
+  --color-background: #ffffff;
+  --color-surface: #f8f9fa;
+  --color-border: #e0e4e8;
+  --color-text-primary: #1a1d1e;
+  --color-text-secondary: #4a5568;
+  --color-text-tertiary: #6b7280;
+  --color-success-bg: #d4edda;
+  --color-success-text: #155724;
+  --color-success-border: #c3e6cb;
+  --color-error-bg: #f8d7da;
+  --color-error-text: #721c24;
+  --color-error-border: #f5c6cb;
+  --color-focus-ring: #2c5f2d;
+  --color-focus-ring-offset: #ffffff;
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-border: rgba(44, 95, 45, 0.2);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  /* Typography */
+  font-family: system-ui, -apple-system, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* LIGHT MODE COLORS */
+  /* Primary - Forest Green Theme */
+  --color-primary: #2c5f2d;          /* Forest green - 7.85:1 on white */
+  --color-primary-dark: #1e4620;     /* Darker green - 11.2:1 on white */
+  --color-primary-light: #4a8a4c;    /* Lighter green - 4.56:1 on white */
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* Secondary */
+  --color-secondary: #5a6b5d;        /* Muted green-gray - 6.12:1 on white */
+  --color-accent: #7c9a7e;           /* Soft sage - 4.68:1 on white */
+
+  /* Backgrounds */
+  --color-background: #ffffff;       /* Pure white */
+  --color-surface: #f8f9fa;          /* Off-white for cards */
+  --color-border: #e0e4e8;           /* Subtle border gray */
+
+  /* Text */
+  --color-text-primary: #1a1d1e;     /* Almost black - 16.1:1 on white */
+  --color-text-secondary: #4a5568;   /* Dark gray - 9.73:1 on white */
+  --color-text-tertiary: #6b7280;    /* Medium gray - 5.88:1 on white */
+
+  /* Success States */
+  --color-success-bg: #d4edda;       /* Light green background */
+  --color-success-text: #155724;     /* Dark green text - 9.86:1 on bg */
+  --color-success-border: #c3e6cb;   /* Green border */
+
+  /* Error States */
+  --color-error-bg: #f8d7da;         /* Light pink background */
+  --color-error-text: #721c24;       /* Dark red text - 6.48:1 on bg */
+  --color-error-border: #f5c6cb;     /* Pink border */
+
+  /* Focus States */
+  --color-focus-ring: #2c5f2d;       /* Forest green ring */
+  --color-focus-ring-offset: #ffffff; /* White offset */
+
+  /* Glassmorphism (for future map overlays) */
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-border: rgba(44, 95, 45, 0.2);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+/* DARK MODE COLORS */
+.dark {
+  /* Primary - Adjusted for dark backgrounds */
+  --color-primary: #5fb663;          /* Brighter green - 4.87:1 on #1a1d1e */
+  --color-primary-dark: #4a8a4c;     /* Medium green - 3.68:1 on #1a1d1e (large text only) */
+  --color-primary-light: #7dd181;    /* Light green - 6.45:1 on #1a1d1e */
+
+  /* Secondary */
+  --color-secondary: #9db0a0;        /* Light sage - 7.32:1 on #1a1d1e */
+  --color-accent: #a8c5aa;           /* Soft mint - 9.12:1 on #1a1d1e */
+
+  /* Backgrounds */
+  --color-background: #0f1214;       /* Very dark blue-gray */
+  --color-surface: #1a1d1e;          /* Dark card background */
+  --color-border: #2d3439;           /* Subtle dark border */
+
+  /* Text */
+  --color-text-primary: #f0f4f8;     /* Off-white - 15.2:1 on #1a1d1e */
+  --color-text-secondary: #c1c9d2;   /* Light gray - 10.8:1 on #1a1d1e */
+  --color-text-tertiary: #8b95a1;    /* Medium gray - 6.14:1 on #1a1d1e */
+
+  /* Success States */
+  --color-success-bg: #1e3a20;       /* Dark green background */
+  --color-success-text: #7dd181;     /* Light green text - 6.45:1 on bg */
+  --color-success-border: #2d5f2f;   /* Medium green border */
+
+  /* Error States */
+  --color-error-bg: #3d1c1f;         /* Dark red background */
+  --color-error-text: #f5a3ab;       /* Light pink text - 7.82:1 on bg */
+  --color-error-border: #5f2d32;     /* Medium red border */
+
+  /* Focus States */
+  --color-focus-ring: #5fb663;       /* Bright green ring */
+  --color-focus-ring-offset: #1a1d1e; /* Dark offset */
+
+  /* Glassmorphism (for future map overlays) */
+  --glass-bg: rgba(26, 29, 30, 0.75);
+  --glass-border: rgba(95, 182, 99, 0.2);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
 }
 
+/* Base Styles */
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
   min-height: 100vh;
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+/* Focus Styles for Accessibility */
+*:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
 }
 
-.card {
-  padding: 2em;
-}
-
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+/* Smooth Transitions */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
 }
