@@ -31,6 +31,22 @@ export const EXAMPLE_STOCKHOLM =
   'POLYGON ((668000 6580000, 673000 6580000, 673000 6585000, 668000 6585000, 668000 6580000))';
 
 /**
+ * Tiny test polygon 1 (~4 hectares) near Linköping.
+ * For quick map interaction testing with fast API responses.
+ * SWEREF99 TM coordinates.
+ */
+export const EXAMPLE_TINY_POLYGON_1 =
+  'POLYGON ((485600 7018300, 485800 7018300, 485800 7018500, 485600 7018500, 485600 7018300))';
+
+/**
+ * Tiny test polygon 2 (~4 hectares) near Linköping.
+ * Different location for testing multiple polygons.
+ * SWEREF99 TM coordinates.
+ */
+export const EXAMPLE_TINY_POLYGON_2 =
+  'POLYGON ((485900 7018600, 486100 7018600, 486100 7018800, 485900 7018800, 485900 7018600))';
+
+/**
  * Example land type filters for forest statistics.
  */
 export const LAND_TYPES = {

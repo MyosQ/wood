@@ -146,3 +146,44 @@ body {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 200ms;
 }
+
+/* Leaflet Map Overrides for Dark Mode */
+.dark .leaflet-container {
+  background: var(--color-background);
+}
+
+.dark .leaflet-control-zoom a {
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  border-color: var(--color-border);
+}
+
+.dark .leaflet-control-zoom a:hover {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.dark .leaflet-control-attribution {
+  background: rgba(26, 29, 30, 0.8);
+  color: var(--color-text-secondary);
+}
+
+.dark .leaflet-control-attribution a {
+  color: var(--color-primary-light);
+}
+
+.dark .leaflet-popup-content-wrapper {
+  background: var(--glass-bg);
+  color: var(--color-text-primary);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+}
+
+.dark .leaflet-popup-tip {
+  background: var(--glass-bg);
+}
+
+/* Dark mode tile layer filter */
+.dark .leaflet-tile-container {
+  filter: brightness(0.7) contrast(1.1) saturate(0.8);
+}
