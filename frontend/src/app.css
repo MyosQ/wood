@@ -140,11 +140,33 @@ body {
   outline-offset: 2px;
 }
 
-/* Smooth Transitions */
-* {
-  transition-property: background-color, border-color, color, fill, stroke;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 200ms;
+/* Utility Classes */
+@layer utilities {
+  .shadow-glass {
+    box-shadow: var(--glass-shadow);
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+}
+
+/* Targeted Transitions (only where they enhance usability) */
+button, a, .interactive {
+  transition: background-color 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Theme transitions */
+:root, .dark {
+  transition: color 200ms, background-color 200ms;
 }
 
 /* Leaflet Map Overrides for Dark Mode */

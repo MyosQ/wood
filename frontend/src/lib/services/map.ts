@@ -57,21 +57,31 @@ export function getAdminLayerStyle(): LayerStyle {
 
 /**
  * Get styling for forestry metric polygons.
- * Uses bright colors for easy visibility during testing.
+ * Uses distinct, vibrant colors optimized for both light and dark themes.
+ * Colors chosen for maximum distinguishability and aesthetic appeal.
  *
  * @param index - Polygon index for color variation
  * @returns LayerStyle configuration for metric polygons
  */
 export function getMetricLayerStyle(index: number): LayerStyle {
-  const colors = ['#ff4444', '#00dddd']; // Red, Cyan - easy to spot
-  const color = colors[index % colors.length];
+  // Color palette: vibrant, distinct hues that work in both light/dark modes
+  const colorSchemes = [
+    { border: '#ff6b6b', fill: '#ff6b6b' }, // Coral Red
+    { border: '#4ecdc4', fill: '#4ecdc4' }, // Turquoise
+    { border: '#ffe66d', fill: '#ffe66d' }, // Sunny Yellow
+    { border: '#a8dadc', fill: '#a8dadc' }, // Sky Blue
+    { border: '#f4a261', fill: '#f4a261' }, // Sandy Orange
+    { border: '#b4a7d6', fill: '#b4a7d6' }, // Lavender Purple
+  ];
+
+  const scheme = colorSchemes[index % colorSchemes.length];
 
   return {
-    color: color,
+    color: scheme.border,
     weight: 3,
-    fillColor: color,
-    fillOpacity: 0.3,
-    opacity: 0.9,
+    fillColor: scheme.fill,
+    fillOpacity: 0.35,
+    opacity: 1,
   };
 }
 

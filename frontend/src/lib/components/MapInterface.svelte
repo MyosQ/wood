@@ -10,102 +10,159 @@
     styleToPathOptions,
   } from '$lib/services/map';
   import { wktToGeoJSON } from '$lib/utils/coordinates';
-  import { EXAMPLE_TINY_POLYGON_1, EXAMPLE_TINY_POLYGON_2 } from '$lib/examples';
+  import {
+    FOREST_AREA_NORRBOTTEN,
+    FOREST_AREA_DALARNA,
+    FOREST_AREA_SMALAND,
+    FOREST_AREA_VASTRA_GOTALAND,
+    FOREST_AREA_GAVLEBORG,
+    FOREST_AREA_VASTERBOTTEN,
+  } from '$lib/examples';
   import MetricsPanel from './MetricsPanel.svelte';
 
+  // State
   let mapContainer = $state<HTMLDivElement>();
   let map = $state<L.Map | null>(null);
   let loading = $state(true);
   let error = $state('');
   let selectedPolygon = $state<{ geometri: string; name: string } | null>(null);
 
-  // Example polygons with metadata
-  const examplePolygons = [
-    { wkt: EXAMPLE_TINY_POLYGON_1, name: 'Forest Area 1', index: 0 },
-    { wkt: EXAMPLE_TINY_POLYGON_2, name: 'Forest Area 2', index: 1 },
-  ];
+  // Example forest areas across Sweden
+  const FOREST_AREAS = [
+    { wkt: FOREST_AREA_NORRBOTTEN, name: 'Norrbotten Forest (1000 ha)', index: 0 },
+    { wkt: FOREST_AREA_DALARNA, name: 'Dalarna Forest (800 ha)', index: 1 },
+    { wkt: FOREST_AREA_SMALAND, name: 'Småland Forest (600 ha)', index: 2 },
+    { wkt: FOREST_AREA_VASTRA_GOTALAND, name: 'Västra Götaland Forest (700 ha)', index: 3 },
+    { wkt: FOREST_AREA_GAVLEBORG, name: 'Gävleborg Forest (900 ha)', index: 4 },
+    { wkt: FOREST_AREA_VASTERBOTTEN, name: 'Västerbotten Forest (1200 ha)', index: 5 },
+  ] as const;
 
-  onMount(async () => {
+  /**
+   * Initialize Leaflet map with base configuration.
+   */
+  function initializeMap(container: HTMLDivElement): L.Map {
+    const config = getDefaultMapConfig();
+    return L.map(container, {
+      center: config.center,
+      zoom: config.zoom,
+      minZoom: config.minZoom,
+      maxZoom: config.maxZoom,
+      preferCanvas: true,
+    });
+  }
+
+  /**
+   * Add OpenStreetMap tile layer to map.
+   */
+  function addTileLayer(leafletMap: L.Map): void {
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19,
+    }).addTo(leafletMap);
+  }
+
+  /**
+   * Load and add Sweden boundary layer, then fit map to bounds.
+   */
+  async function addSwedenBoundary(leafletMap: L.Map): Promise<void> {
+    const swedenGeoJSON = await loadGeoJSON('geojson/sweden.json');
+    const swedenLayer = L.geoJSON(swedenGeoJSON, {
+      style: styleToPathOptions({
+        color: 'var(--color-primary-dark)',
+        weight: 3,
+        fillColor: 'var(--color-primary)',
+        fillOpacity: 0.05,
+        opacity: 0.8,
+      }),
+    }).addTo(leafletMap);
+
+    const bounds = swedenLayer.getBounds();
+    leafletMap.fitBounds(bounds);
+  }
+
+  /**
+   * Load and add administrative areas layer.
+   */
+  async function addAdminAreas(leafletMap: L.Map): Promise<void> {
+    const adminGeoJSON = await loadGeoJSON('geojson/sweden_administrative_areas.json');
+    L.geoJSON(adminGeoJSON, {
+      style: styleToPathOptions(getAdminLayerStyle()),
+    }).addTo(leafletMap);
+  }
+
+  /**
+   * Handle polygon click - select and zoom to area.
+   */
+  function handlePolygonClick(wkt: string, name: string, layer: L.GeoJSON): void {
+    selectedPolygon = { geometri: wkt, name };
+
+    const bounds = layer.getBounds();
+    map?.flyToBounds(bounds, {
+      padding: [50, 50],
+      maxZoom: 14,
+    });
+  }
+
+  /**
+   * Create and add forest area polygon layer with interactions.
+   */
+  function addForestAreaLayer(
+    leafletMap: L.Map,
+    wkt: string,
+    name: string,
+    index: number,
+  ): void {
+    const geojson = wktToGeoJSON(wkt);
+    const style = getMetricLayerStyle(index);
+
+    const layer = L.geoJSON(geojson, {
+      style: styleToPathOptions(style),
+    })
+      .addTo(leafletMap)
+      .on('click', () => handlePolygonClick(wkt, name, layer));
+
+    layer.bindTooltip(name, {
+      permanent: false,
+      direction: 'top',
+      className: 'custom-tooltip',
+    });
+  }
+
+  /**
+   * Add all forest area polygons to map.
+   */
+  function addForestAreas(leafletMap: L.Map): void {
+    FOREST_AREAS.forEach(({ wkt, name, index }) => {
+      addForestAreaLayer(leafletMap, wkt, name, index);
+    });
+  }
+
+  /**
+   * Initialize complete map with all layers.
+   */
+  async function setupMap(): Promise<void> {
     if (!mapContainer) return;
 
     try {
-      // Initialize map
-      const config = getDefaultMapConfig();
-      map = L.map(mapContainer, {
-        center: config.center,
-        zoom: config.zoom,
-        minZoom: config.minZoom,
-        maxZoom: config.maxZoom,
-        preferCanvas: true, // Use Canvas renderer for better performance
-      });
-
-      // Add OpenStreetMap tile layer
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        maxZoom: 19,
-      }).addTo(map);
-
-      // Load and add Sweden boundary
-      const swedenGeoJSON = await loadGeoJSON('geojson/sweden.json');
-      const swedenLayer = L.geoJSON(swedenGeoJSON, {
-        style: styleToPathOptions({
-          color: 'var(--color-primary-dark)',
-          weight: 3,
-          fillColor: 'var(--color-primary)',
-          fillOpacity: 0.05,
-          opacity: 0.8,
-        }),
-      }).addTo(map);
-
-      // Fit map to Sweden bounds
-      const bounds = swedenLayer.getBounds();
-      map.fitBounds(bounds);
-
-      // Load and add administrative areas
-      const adminGeoJSON = await loadGeoJSON('geojson/sweden_administrative_areas.json');
-      L.geoJSON(adminGeoJSON, {
-        style: styleToPathOptions(getAdminLayerStyle()),
-      }).addTo(map);
-
-      // Add example polygons with click handlers
-      examplePolygons.forEach(({ wkt, name, index }) => {
-        const geojson = wktToGeoJSON(wkt);
-        const style = getMetricLayerStyle(index);
-
-        const layer = L.geoJSON(geojson, {
-          style: styleToPathOptions(style),
-        })
-          .addTo(map!)
-          .on('click', () => {
-            // Update selected polygon
-            selectedPolygon = { geometri: wkt, name };
-
-            // Zoom to polygon for better visibility
-            const polygonBounds = layer.getBounds();
-            map!.flyToBounds(polygonBounds, {
-              padding: [50, 50],
-              maxZoom: 14,
-            });
-          });
-
-        // Add tooltip
-        layer.bindTooltip(name, {
-          permanent: false,
-          direction: 'top',
-          className: 'custom-tooltip',
-        });
-      });
+      map = initializeMap(mapContainer);
+      addTileLayer(map);
+      await addSwedenBoundary(map);
+      await addAdminAreas(map);
+      addForestAreas(map);
 
       loading = false;
     } catch (err) {
       error = err instanceof Error ? err.message : 'Failed to initialize map';
       loading = false;
     }
+  }
+
+  onMount(() => {
+    setupMap();
   });
 
   onDestroy(() => {
-    // Clean up map instance to prevent memory leaks
     if (map) {
       map.remove();
       map = null;
@@ -120,8 +177,7 @@
   <!-- Loading Overlay -->
   {#if loading}
     <div
-      class="absolute top-4 right-4 z-[1000] backdrop-blur-md bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-4 py-3 shadow-lg"
-      style="box-shadow: var(--glass-shadow)"
+      class="absolute top-4 right-4 z-[1000] backdrop-blur-md bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-4 py-3 shadow-glass"
       role="status"
       aria-live="polite"
     >
@@ -138,8 +194,7 @@
   <!-- Error Overlay -->
   {#if error}
     <div
-      class="absolute top-4 right-4 z-[1000] backdrop-blur-md bg-[var(--glass-bg)] border border-error-border rounded-lg p-4 shadow-lg max-w-md"
-      style="box-shadow: var(--glass-shadow)"
+      class="absolute top-4 right-4 z-[1000] backdrop-blur-md bg-[var(--glass-bg)] border border-error-border rounded-lg p-4 shadow-glass max-w-md"
       role="alert"
     >
       <h3 class="text-error-text font-semibold mb-2">Error Loading Map</h3>
@@ -151,19 +206,6 @@
   {#if selectedPolygon && !loading}
     <div class="absolute bottom-4 right-4 z-[1000]">
       <MetricsPanel geometri={selectedPolygon.geometri} name={selectedPolygon.name} />
-    </div>
-  {/if}
-
-  <!-- Instructions Overlay (top-left) -->
-  {#if !loading && !error}
-    <div
-      class="absolute top-4 left-4 z-[1000] backdrop-blur-md bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-lg px-4 py-3 shadow-lg max-w-xs"
-      style="box-shadow: var(--glass-shadow)"
-    >
-      <h3 class="text-text-primary font-semibold mb-1">Forest Metrics Explorer</h3>
-      <p class="text-text-secondary text-sm">
-        Click on colored polygons to view forest metrics
-      </p>
     </div>
   {/if}
 </div>

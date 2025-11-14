@@ -31,20 +31,52 @@ export const EXAMPLE_STOCKHOLM =
   'POLYGON ((668000 6580000, 673000 6580000, 673000 6585000, 668000 6585000, 668000 6580000))';
 
 /**
- * Tiny test polygon 1 (~4 hectares) near Linköping.
- * For quick map interaction testing with fast API responses.
+ * Large forest area in Northern Sweden, Norrbotten (~1000 hectares).
+ * Boreal forest region with high timber volume.
  * SWEREF99 TM coordinates.
  */
-export const EXAMPLE_TINY_POLYGON_1 =
-  'POLYGON ((485600 7018300, 485800 7018300, 485800 7018500, 485600 7018500, 485600 7018300))';
+export const FOREST_AREA_NORRBOTTEN =
+  'POLYGON ((770000 7420000, 773000 7420000, 773500 7423000, 770500 7423500, 770000 7420000))';
 
 /**
- * Tiny test polygon 2 (~4 hectares) near Linköping.
- * Different location for testing multiple polygons.
+ * Large forest area in Central Sweden, Dalarna (~800 hectares).
+ * Mixed forest with good accessibility.
  * SWEREF99 TM coordinates.
  */
-export const EXAMPLE_TINY_POLYGON_2 =
-  'POLYGON ((485900 7018600, 486100 7018600, 486100 7018800, 485900 7018800, 485900 7018600))';
+export const FOREST_AREA_DALARNA =
+  'POLYGON ((475000 6780000, 477500 6780000, 478000 6782500, 475500 6783000, 475000 6780000))';
+
+/**
+ * Large forest area in Småland, Southern Sweden (~600 hectares).
+ * Productive coniferous forest region.
+ * SWEREF99 TM coordinates.
+ */
+export const FOREST_AREA_SMALAND =
+  'POLYGON ((525000 6420000, 527500 6420000, 527500 6422500, 525000 6422500, 525000 6420000))';
+
+/**
+ * Large forest area in Västra Götaland, Western Sweden (~700 hectares).
+ * Mixed deciduous and coniferous forest.
+ * SWEREF99 TM coordinates.
+ */
+export const FOREST_AREA_VASTRA_GOTALAND =
+  'POLYGON ((365000 6445000, 367500 6445000, 368000 6447500, 365500 6448000, 365000 6445000))';
+
+/**
+ * Large forest area in Gävleborg, Eastern Sweden (~900 hectares).
+ * Coastal forest region with good growth conditions.
+ * SWEREF99 TM coordinates.
+ */
+export const FOREST_AREA_GAVLEBORG =
+  'POLYGON ((665000 6820000, 668000 6820000, 668500 6823000, 665500 6823500, 665000 6820000))';
+
+/**
+ * Large forest area in Västerbotten, Northern inland (~1200 hectares).
+ * Old-growth boreal forest with high conservation value.
+ * SWEREF99 TM coordinates.
+ */
+export const FOREST_AREA_VASTERBOTTEN =
+  'POLYGON ((695000 7180000, 698500 7180000, 699000 7183500, 695500 7184000, 695000 7180000))';
 
 /**
  * Example land type filters for forest statistics.
