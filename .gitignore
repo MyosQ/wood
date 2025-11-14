@@ -41,3 +41,6 @@ logs/
 
 # Node (frontend)
 node_modules/
+
+# GitHub CLI
+.gh_config/

@@ -140,9 +140,72 @@ body {
   outline-offset: 2px;
 }
 
-/* Smooth Transitions */
-* {
-  transition-property: background-color, border-color, color, fill, stroke;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 200ms;
+/* Utility Classes */
+@layer utilities {
+  .shadow-glass {
+    box-shadow: var(--glass-shadow);
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+}
+
+/* Targeted Transitions (only where they enhance usability) */
+button, a, .interactive {
+  transition: background-color 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Theme transitions */
+:root, .dark {
+  transition: color 200ms, background-color 200ms;
+}
+
+/* Leaflet Map Overrides for Dark Mode */
+.dark .leaflet-container {
+  background: var(--color-background);
+}
+
+.dark .leaflet-control-zoom a {
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  border-color: var(--color-border);
+}
+
+.dark .leaflet-control-zoom a:hover {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.dark .leaflet-control-attribution {
+  background: rgba(26, 29, 30, 0.8);
+  color: var(--color-text-secondary);
+}
+
+.dark .leaflet-control-attribution a {
+  color: var(--color-primary-light);
+}
+
+.dark .leaflet-popup-content-wrapper {
+  background: var(--glass-bg);
+  color: var(--color-text-primary);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+}
+
+.dark .leaflet-popup-tip {
+  background: var(--glass-bg);
+}
+
+/* Dark mode tile layer filter */
+.dark .leaflet-tile-container {
+  filter: brightness(0.7) contrast(1.1) saturate(0.8);
 }
